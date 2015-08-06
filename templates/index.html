@@ -1,0 +1,50 @@
+{% extends "_layouts/cp" %}
+
+{% set routes = craft.rssentries.getAllRoutes %}
+{% set title = "RSS Entries"|t %}
+
+{% set content %}
+
+    {{ "Provide an RSS feed, get entries."|t }}
+
+    <p id="noroutes"{% if routes|length %} class="hidden"{% endif %}>
+        {{ "No ingredients exist yet."|t }}
+    </p>
+
+    {% if routes|length %}
+        <table id="routes" class="data">
+            <thead>
+                <th scope="col">{{ "Channel"|t }}</th>
+                <th scope="col">{{ "RSS Path"|t }}</th>
+                <th scope="col">{{ "Refresh Interval"|t }}</th>
+                <th class="thin"></th>
+            </thead>
+            <tbody>
+
+                {% for route in routes %}
+                    <tr data-id="{{ route.id }}" data-name="{{ route.channel|t }}">
+                        <td><a href="{{ url('rssentries/routes/'~route.id) }}">{{ route.channel }}</a></td>
+                        <td><a href="{{ route.url }}">{{ route.url }}</a></td>
+                        <td style="text-align: center;"><a href="{{ url('rssentries/routes/'~route.id) }}">{{ route.getInterval }}</a></td>
+                        <td><a class="delete icon" title="{{ 'Delete'|t }}"></a></td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    {% endif %}
+
+    <div class="buttons">
+        <a href="{{ url('rssentries/routes/new') }}" class="btn add icon">{{ "New Route"|t }}</a>
+    </div>
+
+{% endset %}
+
+{% set js %}
+    new Craft.AdminTable({
+        tableSelector: '#routes',
+        noObjectsSelector: '#noroutes',
+        deleteAction: 'rssentries/routes/deleteRoute'
+    });
+{% endset %}
+{% includeJs js %}

@@ -1,0 +1,32 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+	first:        true,
+	label:        "RSS Feed Path"|t,
+	id:           'rssPath',
+	name:         'rssPath',
+	instructions: "Path for the RSS feed that will be creating entries."|t,
+	value:        settings.rssPath,
+	autofocus:    true,
+	errors:       settings.getErrors('rssPath')
+}) }}
+
+{{ forms.selectField({
+	label:        "Entries Channel"|t,
+	id:           'entriesChannel',
+	name:         'entriesChannel',
+	instructions: "Channel to which the entries will belong to."|t,
+	value:        settings.entriesChannel,
+  options:      settings.entriesChannel,
+	errors:       settings.getErrors('entriesChannel')
+}) }}
+
+{{ forms.selectField({
+	label:        "Refresh Interval"|t,
+	id:           'refreshInterval',
+	name:         'refreshInterval',
+	instructions: "Refresh interval for the RSS feed."|t,
+	value:        settings.refreshInterval,
+  options:      settings.refreshInterval,
+	errors:       settings.getErrors('refreshInterval')
+}) }}
