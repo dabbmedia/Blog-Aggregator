@@ -24,6 +24,7 @@ class RssEntries_RoutesController extends BaseController
         }
 
         $attributes = craft()->request->getPost('route');
+
         $model->setAttributes($attributes);
 
         if (craft()->rssEntries->saveRoute($model)) {
