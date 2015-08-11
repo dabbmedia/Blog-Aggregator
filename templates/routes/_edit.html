@@ -18,6 +18,14 @@
     { label: "RSS Routes"|t, url: url('rssentries') }
 ] %}
 
+{% set options = [] %}
+{% set channels = craft.sections.getAllSections() %}
+{% for channel in channels %}
+  {% if channel.type == 'channel' %}
+    {% set options = options|merge([{label: channel.handle, 'value': channel.id}]) %}
+  {% endif %}
+{% endfor %}
+
 {# comment
 http://client.hrservicesinc.com/downloads/rss/portals/1936.xml
 #}
@@ -40,8 +48,8 @@ http://client.hrservicesinc.com/downloads/rss/portals/1936.xml
             label: 'Channel Name'|t,
             required: true,
             name: 'route[channel]',
-            value: ['jobs'],
-            options: ['jobs'],
+            value: route ? route.channel : null,
+            options: options,
             errors: route ? route.errors('channel') : null,
         }) }}
         {{ forms.selectField({

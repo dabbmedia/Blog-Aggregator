@@ -16,16 +16,20 @@
             <thead>
                 <th scope="col">{{ "Channel"|t }}</th>
                 <th scope="col">{{ "RSS Path"|t }}</th>
-                <th scope="col">{{ "Refresh Interval"|t }}</th>
+                <!--<th scope="col">{{ "Refresh Interval"|t }}</th>
+                <th scope="col">{{ "Last Run"|t }}</th>-->
+                <th scope="col"></th>
                 <th class="thin"></th>
             </thead>
             <tbody>
 
                 {% for route in routes %}
-                    <tr data-id="{{ route.id }}" data-name="{{ route.channel|t }}">
-                        <td><a href="{{ url('rssentries/routes/'~route.id) }}">{{ route.channel }}</a></td>
+                    <tr data-id="{{ route.id }}" data-name="{{ route.url|t }}">
+                        <td><a href="{{ url('rssentries/routes/'~route.id) }}">{{ craft.sections.getSectionById(route.channel).name }}</a></td>
                         <td><a href="{{ route.url }}">{{ route.url }}</a></td>
-                        <td style="text-align: center;"><a href="{{ url('rssentries/routes/'~route.id) }}">{{ route.getInterval }}</a></td>
+                        <!--<td style="text-align: center;"><a href="{{ url('rssentries/routes/'~route.id) }}">{{ route.getInterval }}</a></td>
+                        <td></td>-->
+                        <td><div class="btn small fullwidth runaction" data-action="/actions/rssEntries/start" data-parameters="{{route.id}}">{{ 'Run Now'|t }}</div></td>
                         <td><a class="delete icon" title="{{ 'Delete'|t }}"></a></td>
                     </tr>
                 {% endfor %}
@@ -44,7 +48,13 @@
     new Craft.AdminTable({
         tableSelector: '#routes',
         noObjectsSelector: '#noroutes',
-        deleteAction: 'rssentries/routes/deleteRoute'
+        deleteAction: 'rssEntries/routes/deleteRoute'
     });
+
+    $('.runaction').click(function(){
+      var data = { route: $(this).attr('data-parameters') };
+      $.post($(this).attr('data-action'), data);
+    });
+
 {% endset %}
 {% includeJs js %}
