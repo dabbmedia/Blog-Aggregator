@@ -71,7 +71,6 @@ class RssEntriesTask extends BaseTask
         $record['description'] = $item['description'];
 
 				$records[] = $record;
-        break;
 			}
 		}
 
