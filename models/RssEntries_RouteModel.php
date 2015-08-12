@@ -18,7 +18,7 @@ class RssEntries_RouteModel extends BaseModel
      */
     public function __toString()
     {
-        return $this->channel;
+        return $this->url;
     }
 
     public function getInterval() {
@@ -34,7 +34,7 @@ class RssEntries_RouteModel extends BaseModel
             $return = '24hrs';
             break;
         }
-  
+
         return $return;
     }
 

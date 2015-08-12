@@ -14,8 +14,8 @@ class RssEntriesTask extends BaseTask
 	protected function defineSettings()
 	{
 		return array(
-			'channel'	=> AttributeType::Number,
-			'type'		=> AttributeType::Number
+      'route'   => AttributeType::Number,
+			'channel'	=> AttributeType::Number
 		);
 	}
 	/**
@@ -25,7 +25,7 @@ class RssEntriesTask extends BaseTask
 	 */
 	public function getDescription()
 	{
-		return 'Taking a power nap';
+		return 'Parsing RSS';
 	}
 	/**
 	 * Gets the total number of steps for this task.
@@ -46,8 +46,15 @@ class RssEntriesTask extends BaseTask
 	{
 		require_once craft()->path->getPluginsPath().'rssentries/vendor/SimpleHTMLDom/simple_html_dom.php';
 
-		RssEntriesPlugin::log('Loading Channel: '.$this->getSettings()->channel, LogLevel::Info);
-		$routes = craft()->rssEntries->getAllRoutesForChannel($this->getSettings()->channel);
+    if(isset($this->getSettings()->route)&&!empty($this->getSettings()->route))
+    {
+      RssEntriesPlugin::log('Loading Route: '.$this->getSettings()->route, LogLevel::Info);
+      $routes[] = craft()->rssEntries->getRouteById($this->getSettings()->route);
+    }
+    else {
+      RssEntriesPlugin::log('Loading Channel: '.$this->getSettings()->channel, LogLevel::Info);
+      $routes = craft()->rssEntries->getAllRoutesForChannel($this->getSettings()->channel);
+    }
 
 		foreach($routes as $route)
 		{
@@ -96,6 +103,23 @@ class RssEntriesTask extends BaseTask
 				sleep(1);
 			}
 
+			/*
+      $feed = implode(file($route->url));
+      $xml = simplexml_load_string($feed);
+      $json = json_encode($xml);
+      $array = json_decode($json,TRUE);
+
+			foreach( $array['channel']['item'] as $item )
+			{
+				$record = [];
+        RssEntriesPlugin::log('Fetching URL: '.json_encode($item), LogLevel::Info);
+
+        $record['title'] = $item['title'];
+        $record['description'] = $item['description'];
+
+				$records[] = $record;
+			}*/
+
 		}
 
 		RssEntriesPlugin::log('Writing '.count($records).' records.', LogLevel::Info);
@@ -103,10 +127,7 @@ class RssEntriesTask extends BaseTask
 		foreach($records as $record) {
 
 			 $entry = new EntryModel();
-			 $entry->sectionId   = craft()->sections->getSectionByHandle('jobs')->id; // Use 'id' from 'craft_sections' table
-			 $entry->typeId      = 14; // Use 'id' from 'craft_entrytypes' table
-			 //$entry->typeId = craft()->entries->section('jobs')->type('jobs')->id;
-			 $entry->authorId    = null; // Use 'id' from 'craft_users' table
+			 $entry->sectionId   = $route->channel; // Use 'id' from 'craft_sections' table
 			 $entry->enabled     = true;
 
 			 $entry->getContent()->setAttributes($record);
@@ -129,6 +150,7 @@ class RssEntriesTask extends BaseTask
 		}
 		return true;
 	}
+
 	private function keyFormatter($strKey){
 
 		switch($strKey){
@@ -169,4 +191,5 @@ class RssEntriesTask extends BaseTask
 
 		return $return;
 	}
+
 }

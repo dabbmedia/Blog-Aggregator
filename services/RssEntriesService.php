@@ -65,18 +65,18 @@ class RssEntriesService extends BaseApplicationComponent
     }
 
     /**
-     * Get all routes from the database matching a Channel.
-     *
-     * @return array
-     */
-    public function getAllRoutesForChannel($channelId)
-    {
-        $records = $this->routeRecord->findAllByAttributes(array('channel'=>$channelId));
+    * Get all routes from the database matching a Channel.
+    *
+    * @return array
+    */
+   public function getAllRoutesForChannel($channelId)
+   {
+       $records = $this->routeRecord->findAllByAttributes(array('channel'=>$channelId));
 
-        return RssEntries_RouteModel::populateModels($records, 'id');
-    }
+       return RssEntries_RouteModel::populateModels($records, 'id');
+   }
 
-    /**
+   /**
      * Save a new or existing route back to the database.
      *
      * @param  RssEntries_RouteModel $model

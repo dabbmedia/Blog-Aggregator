@@ -11,22 +11,11 @@ class RssEntriesController extends BaseController
 	 */
 	public function actionStart()
 	{
-		$strChannelName = craft()->request->getParam('channel');
-		if(empty($strChannelName))
-		{
-			$strChannelName = 'jobs';
-		}
-		$intChannelId = craft()->sections->getSectionByHandle('jobs')->id;
-		$intTypeId = craft()->request->getParam('type');
+    $intRouteId = craft()->request->getParam('route');
+		$intChannelId = craft()->request->getParam('channel');
 
-		if(empty($intTypeId))
-		{
-			$intTypeId = '14';
-		}
+    craft()->tasks->createTask('RssEntries', 'Update Entries from RSS', array('route'=>$intRouteId,'channel'=>$intChannelId));
 
-    craft()->tasks->createTask('RssEntries', 'Update "'.$strChannelName.'" Entries', array('channel'=>$intChannelId,'type'=>$intTypeId));
-
-		echo 'Fetching RSS!';
 		craft()->end();
 	}
 }
