@@ -69,6 +69,10 @@ class RssEntriesTask extends BaseTask
 			{
 				$record = [];
 
+				RssEntriesPlugin::log('Monks '.json_encode($position), LogLevel::Info);
+
+				$record['pubDate'] = $position['pubDate'];
+
 				RssEntriesPlugin::log('Fetching URL: '.$position['link'], LogLevel::Info);
 
 				$html = file_get_html($position['link']);
@@ -84,7 +88,13 @@ class RssEntriesTask extends BaseTask
 
 						if($strKey == 'Category')
 						{
-							$mixValue = array(157);
+							$criteria = craft()->elements->getCriteria(ElementType::Entry);
+							$criteria->title = trim(str_replace('&nbsp;','',$sibling));
+							$categories = craft()->elements->findElements($criteria);
+							foreach( $categories as $category ){
+								$categoryId = $category->id;
+							}
+							$mixValue = array($categoryId);
 						}
 						else
 						{
@@ -99,28 +109,19 @@ class RssEntriesTask extends BaseTask
 				$record['jobApplicationUrl'] = 'https://recruiting.myapps.paychex.com/appone/'.$objLink->action;
 
 				$records[] = $record;
-
 				sleep(1);
 			}
-
-			/*
-      $feed = implode(file($route->url));
-      $xml = simplexml_load_string($feed);
-      $json = json_encode($xml);
-      $array = json_decode($json,TRUE);
-
-			foreach( $array['channel']['item'] as $item )
-			{
-				$record = [];
-        RssEntriesPlugin::log('Fetching URL: '.json_encode($item), LogLevel::Info);
-
-        $record['title'] = $item['title'];
-        $record['description'] = $item['description'];
-
-				$records[] = $record;
-			}*/
-
 		}
+
+		// Delete all Entries in this channel
+		$criteria = craft()->elements->getCriteria(ElementType::Entry);
+		$criteria->sectionId = $route->channel;
+		$criteria->limit = null;
+		$entries = $criteria->find();
+		foreach($entries as $entry){
+			craft()->entries->deleteEntry($entry);
+		}
+		RssEntriesPlugin::log('Entries Count: '.count($entries), LogLevel::Info);
 
 		RssEntriesPlugin::log('Writing '.count($records).' records.', LogLevel::Info);
 
@@ -129,6 +130,11 @@ class RssEntriesTask extends BaseTask
 			 $entry = new EntryModel();
 			 $entry->sectionId   = $route->channel; // Use 'id' from 'craft_sections' table
 			 $entry->enabled     = true;
+			 $entry->postDate		 = date("Y-m-d H:i:s", strtotime($record['pubDate']));
+			 /*
+			 $entry->setContentFromPost(array(
+    		'tagFieldHandle' => $myTagIds,
+			));*/
 
 			 $entry->getContent()->setAttributes($record);
 
