@@ -94,7 +94,10 @@ class RssEntriesTask extends BaseTask
 							foreach( $categories as $category ){
 								$categoryId = $category->id;
 							}
-							$mixValue = array($categoryId);
+							if(isset($categoryId)&&!empty($categoryId))
+							{
+								$mixValue = array($categoryId);
+							}
 						}
 						else
 						{
